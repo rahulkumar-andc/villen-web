@@ -33,3 +33,11 @@ class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+from .models import ContactMessage
+from .core_serializers import ContactSerializer
+
+class ContactCreate(generics.CreateAPIView):
+    queryset = ContactMessage.objects.all()
+    serializer_class = ContactSerializer
+    permission_classes = [permissions.AllowAny]

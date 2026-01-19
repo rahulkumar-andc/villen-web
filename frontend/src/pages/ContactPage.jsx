@@ -15,10 +15,15 @@ export const ContactPage = () => {
             const res = await fetch('http://127.0.0.1:8000/api/contact/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ timestamp: Date.now() }) // In real app, send actual data
+                body: JSON.stringify({
+                    name: e.target.name.value,
+                    email: e.target.email.value,
+                    message: e.target.message.value
+                })
             });
             if (res.ok) {
                 setStatus('Transmission Received. Stand by.');
+                e.target.reset(); // Clear form
             } else {
                 setStatus('Transmission Failed. Signal Jammed.');
             }
@@ -48,15 +53,15 @@ export const ContactPage = () => {
                         <form className="contact-form" onSubmit={handleSubmit}>
                             <div className="form-group">
                                 <label>Codename</label>
-                                <input type="text" placeholder="Enter identification..." required />
+                                <input type="text" name="name" placeholder="Enter identification..." required />
                             </div>
                             <div className="form-group">
                                 <label>Frequency (Email)</label>
-                                <input type="email" placeholder="Enter secure channel..." required />
+                                <input type="email" name="email" placeholder="Enter secure channel..." required />
                             </div>
                             <div className="form-group">
                                 <label>Message Payload</label>
-                                <textarea placeholder="Encrypting message content..." rows="5" required></textarea>
+                                <textarea name="message" placeholder="Encrypting message content..." rows="5" required></textarea>
                             </div>
 
                             <button className="btn-transmit" disabled={loading}>

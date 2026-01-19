@@ -253,5 +253,20 @@ class Note(models.Model):
         return f"{self.title} - {self.created_at.strftime('%Y-%m-%d')}"
 
 
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField()
+    message = models.TextField()
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Msg from {self.email} - {self.created_at.strftime('%Y-%m-%d')}"
+
+
 
 
