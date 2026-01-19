@@ -85,3 +85,7 @@ npm run dev
 For detailed instructions on deploying to **Vercel** (Frontend) and **PythonAnywhere** (Backend) with **villen.me** domain configuration, see:
 👉 [DEPLOY_GUIDE_VILLEN.md](DEPLOY_GUIDE_VILLEN.md)
 
+For configuring **blog.villen.me**, see:
+👉 [SUBDOMAIN_GUIDE.md](SUBDOMAIN_GUIDE.md)
+
+
