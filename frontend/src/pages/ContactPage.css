@@ -1,0 +1,127 @@
+.contact-container {
+    padding-top: 50px;
+    padding-bottom: 80px;
+    min-height: 80vh;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.contact-header h1 {
+    font-size: 3.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.contact-header .subtitle {
+    font-family: var(--font-mono);
+    color: var(--accent-primary);
+    letter-spacing: 2px;
+    font-size: 1rem;
+}
+
+.contact-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(5, 10, 9, 0.8);
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-header {
+    background: rgba(0, 255, 157, 0.1);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(0, 255, 157, 0.1);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--accent-primary);
+}
+
+.contact-form {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    color: var(--text-primary);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    transition: all 0.3s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+    background: rgba(0, 255, 157, 0.05);
+}
+
+.btn-transmit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--accent-primary);
+    color: #000;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.btn-transmit:hover:not(:disabled) {
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-transmit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.status-message {
+    padding: 1rem 2rem;
+    border-top: 1px solid var(--border-color);
+    font-family: var(--font-mono);
+    color: var(--accent-primary);
+    background: rgba(0, 255, 157, 0.05);
+}
+
+.blink {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}

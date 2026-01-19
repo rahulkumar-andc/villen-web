@@ -1,0 +1,130 @@
+.terminal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.1s ease-out;
+}
+
+.terminal-window {
+    width: 800px;
+    height: 500px;
+    background: rgba(10, 10, 15, 0.95);
+    border: 1px solid rgba(0, 255, 157, 0.3);
+    box-shadow: 0 0 30px rgba(0, 255, 157, 0.1);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: scaleUp 0.1s ease-out;
+}
+
+.terminal-header {
+    height: 30px;
+    background: rgba(0, 255, 157, 0.05);
+    border-bottom: 1px solid rgba(0, 255, 157, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.terminal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.8rem;
+    color: #00ff9d;
+}
+
+.terminal-close {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+}
+
+.terminal-close:hover {
+    color: #fff;
+}
+
+.terminal-body {
+    flex: 1;
+    padding: 10px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9rem;
+    color: #e0e6f0;
+    overflow-y: auto;
+    cursor: text;
+}
+
+.terminal-line {
+    margin-bottom: 4px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.terminal-line.command {
+    color: #888;
+    margin-top: 10px;
+}
+
+.terminal-line.error {
+    color: #ef4444;
+}
+
+.terminal-line.info {
+    color: #00ff9d;
+}
+
+.terminal-form {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.prompt {
+    color: #00ff9d;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.terminal-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

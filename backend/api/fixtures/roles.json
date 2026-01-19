@@ -1,0 +1,72 @@
+[
+    {
+        "model": "api.role",
+        "pk": 1,
+        "fields": {
+            "name": "Super Admin",
+            "level": 1,
+            "role_type": "SYSTEM",
+            "description": "Full system access. Manage all admins and system settings."
+        }
+    },
+    {
+        "model": "api.role",
+        "pk": 2,
+        "fields": {
+            "name": "Admin",
+            "level": 2,
+            "role_type": "SYSTEM",
+            "description": "Manage users, content, and application settings."
+        }
+    },
+    {
+        "model": "api.role",
+        "pk": 3,
+        "fields": {
+            "name": "Monitor",
+            "level": 3,
+            "role_type": "SYSTEM",
+            "description": "View logs, moderate content, manage reports."
+        }
+    },
+    {
+        "model": "api.role",
+        "pk": 4,
+        "fields": {
+            "name": "Developer",
+            "level": 4,
+            "role_type": "APPLICATION",
+            "description": "Debug tools, logs access, test features. Internal use."
+        }
+    },
+    {
+        "model": "api.role",
+        "pk": 5,
+        "fields": {
+            "name": "Premium User",
+            "level": 5,
+            "role_type": "USER",
+            "description": "Paid or verified user with premium features."
+        }
+    },
+    {
+        "model": "api.role",
+        "pk": 6,
+        "fields": {
+            "name": "Normal User",
+            "level": 6,
+            "role_type": "USER",
+            "description": "Standard registered user."
+        }
+    },
+    {
+        "model": "api.role",
+        "pk": 7,
+        "fields": {
+            "name": "Guest",
+            "level": 7,
+            "role_type": "USER",
+            "description": "Anonymous user. Read-only access."
+        }
+    }
+]

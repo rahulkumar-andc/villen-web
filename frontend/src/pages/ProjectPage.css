@@ -1,0 +1,199 @@
+.project-page-container {
+    padding-top: 50px;
+    padding-bottom: 80px;
+}
+
+.project-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.project-header h1 {
+    font-size: 3.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.project-header .subtitle {
+    font-family: var(--font-mono);
+    color: var(--accent-primary);
+    letter-spacing: 2px;
+    font-size: 1rem;
+}
+
+/* Grid Layout */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+/* Card Styles */
+.project-card {
+    background: #0a0a0a;
+    /* Darker than glass for contrast, similar to reference */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    /* Soft glow initial */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(0, 255, 157, 0.3);
+    box-shadow: 0 10px 30px -10px rgba(0, 255, 157, 0.15);
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(0, 255, 157, 0.05), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.project-card:hover::before {
+    opacity: 1;
+}
+
+/* Header */
+.card-header {
+    margin-bottom: 1rem;
+}
+
+.category-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* Body */
+.card-body {
+    flex-grow: 1;
+    margin-bottom: 2rem;
+}
+
+.card-body h3 {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin-bottom: 0.8rem;
+    font-weight: 700;
+}
+
+.card-body p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Footer */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+}
+
+.status-green {
+    background: rgba(0, 255, 157, 0.1);
+    color: #00ff9d;
+    border: 1px solid rgba(0, 255, 157, 0.2);
+}
+
+.status-yellow {
+    background: rgba(255, 215, 0, 0.1);
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.status-grey {
+    background: rgba(255, 255, 255, 0.1);
+    color: #a0a0a0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Buttons */
+.btn-view {
+    padding: 8px 16px;
+    background: #ff3e3e;
+    /* Standard 'View on Github' often red/orange in reference or brand */
+    /* Wait, user theme is Green. Spyboy uses Red/Pink buttons. 
+       I will stick to User Theme (Green) unless specified? 
+       User said "Spyboy reference". Spyboy uses Red/Pink.
+       "Villen" theme is Green. I will use a Red/Pink accent for buttons to match Spyboy style requested
+       OR I will use Green to stay consistent. 
+       "Add subtle grid + glow animation (you already nailed this part 👌)" implies keeping existing theme.
+       "Spyboy" reference was for LAYOUT.
+       I will use a high contrast button, maybe Red is too much clash. 
+       I will use the Green Glow button style but compacted.
+    */
+    background: crimson;
+    /* Let's try a distinct color for action, or stick to theme. */
+    /* Actually, consistency is better. I will use the theme Accent. */
+    background: var(--accent-primary);
+    color: #000;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    transition: all 0.2s;
+    box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+}
+
+.btn-view:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.6);
+    transform: scale(1.05);
+}
+
+/* Let's try to match Spyboy Red button for contrast if user likes Spyboy */
+/* But 'Villen' is Green. I'll stick to a 'btn-grad' */
+.btn-view {
+    background: linear-gradient(135deg, #00ff9d, #00cc7d);
+    border: none;
+}
+
+.btn-view.disabled {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.btn-view.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.project-footer-quote {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    opacity: 0.7;
+    margin-top: 2rem;
+}

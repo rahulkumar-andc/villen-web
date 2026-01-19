@@ -1,0 +1,375 @@
+/* ========================================
+   ADMIN DASHBOARD STYLES
+   ======================================== */
+
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+    background: #0a0a0a;
+    color: #e0e6f0;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 250px;
+    background: #0f0f1a;
+    border-right: 1px solid rgba(0, 255, 157, 0.1);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-logo {
+    font-family: 'Orbitron', 'Roboto Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #00ff9d;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.admin-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    background: none;
+    border: none;
+    color: #888;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.admin-nav-btn:hover {
+    background: rgba(0, 255, 157, 0.05);
+    color: #fff;
+}
+
+.admin-nav-btn.active {
+    background: rgba(0, 255, 157, 0.1);
+    color: #00ff9d;
+    border-left: 3px solid #00ff9d;
+}
+
+.admin-logout {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.admin-logout:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Main Content */
+.admin-main {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-header h1 {
+    font-family: 'Orbitron', 'Roboto Mono', monospace;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.admin-btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #00ff9d, #00cc7d);
+    border: none;
+    color: #0a0a0a;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-btn-primary:hover {
+    box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Table */
+.admin-table-container {
+    background: rgba(15, 15, 26, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    padding: 1rem;
+    text-align: left;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.9rem;
+}
+
+.admin-table tr:hover {
+    background: rgba(0, 255, 157, 0.02);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.7rem;
+    border-radius: 20px;
+    font-family: 'Roboto Mono', monospace;
+    margin-right: 0.5rem;
+}
+
+.status-badge.public {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.status-badge.private {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.status-badge.restricted {
+    background: rgba(139, 92, 246, 0.15);
+    color: #8b5cf6;
+}
+
+/* Action Buttons */
+.admin-action-btn {
+    background: none;
+    border: none;
+    color: #888;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-right: 0.5rem;
+}
+
+.admin-action-btn:hover {
+    color: #00ff9d;
+}
+
+.admin-action-btn.delete:hover {
+    color: #ef4444;
+}
+
+.admin-empty {
+    text-align: center;
+    color: #666;
+    padding: 3rem;
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 70px;
+        padding: 1rem 0.5rem;
+    }
+
+    .admin-logo span:last-child,
+    .admin-nav-btn span,
+    .admin-logout span {
+        display: none;
+    }
+
+    .admin-nav-btn,
+    .admin-logout {
+        justify-content: center;
+    }
+}
+
+/* Editor Styles */
+.admin-editor-container {
+    min-height: 100vh;
+    background: #0a0a0a;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0f0f1a;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.editor-btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #00ff9d;
+    color: #000;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.editor-btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-family: 'Roboto Mono', monospace;
+    cursor: pointer;
+}
+
+.editor-layout {
+    flex: 1;
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem;
+    gap: 2rem;
+}
+
+.editor-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.editor-input-title {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+}
+
+.editor-input-title::placeholder {
+    color: #333;
+}
+
+.form-row {
+    display: flex;
+    gap: 2rem;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.editor-input,
+.editor-select,
+.editor-textarea {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75rem;
+    color: #fff;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+}
+
+.editor-textarea.code {
+    font-family: 'Roboto Mono', monospace;
+    line-height: 1.6;
+}
+
+.editor-preview {
+    flex: 1;
+    background: #0a0a12;
+    padding: 2rem;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.preview-mode .editor-preview {
+    display: block;
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    background: rgba(10, 10, 18, 0.95);
+}

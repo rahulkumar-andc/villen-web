@@ -1,0 +1,223 @@
+.cyber-gate {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    pointer-events: all;
+    overflow: hidden;
+}
+
+/* Light emission from center */
+.gate-light {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center,
+            rgba(0, 255, 157, 0.3) 0%,
+            rgba(0, 255, 157, 0.1) 30%,
+            transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.cyber-gate.opening .gate-light {
+    opacity: 1;
+}
+
+.cyber-gate.closing .gate-light {
+    opacity: 0;
+}
+
+/* Door base styles */
+.gate-door {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(180deg,
+            #0a0a0a 0%,
+            #1a1a2e 50%,
+            #0a0a0a 100%);
+    transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.gate-left {
+    left: 0;
+    transform: translateX(0);
+}
+
+.gate-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+/* Opening animation */
+.cyber-gate.opening .gate-left {
+    transform: translateX(-100%);
+}
+
+.cyber-gate.opening .gate-right {
+    transform: translateX(100%);
+}
+
+/* Closing animation */
+.cyber-gate.closing .gate-left {
+    transform: translateX(0);
+    animation: doorCloseLeft 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.cyber-gate.closing .gate-right {
+    transform: translateX(0);
+    animation: doorCloseRight 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes doorCloseLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes doorCloseRight {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Door inner styling */
+.door-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Metallic lines pattern */
+.door-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 5%;
+}
+
+.door-line {
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(0, 255, 157, 0.1) 20%,
+            rgba(0, 255, 157, 0.3) 50%,
+            rgba(0, 255, 157, 0.1) 80%,
+            transparent 100%);
+}
+
+/* Neon edge glow */
+.door-edge {
+    position: absolute;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,
+            transparent 0%,
+            #00ff9d 20%,
+            #00ff9d 80%,
+            transparent 100%);
+    box-shadow:
+        0 0 20px #00ff9d,
+        0 0 40px #00ff9d,
+        0 0 60px rgba(0, 255, 157, 0.5);
+}
+
+.gate-left .door-edge {
+    right: 0;
+}
+
+.gate-right .door-edge {
+    left: 0;
+}
+
+/* Center seam glow */
+.gate-seam {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background: #00ff9d;
+    box-shadow:
+        0 0 10px #00ff9d,
+        0 0 20px #00ff9d,
+        0 0 40px rgba(0, 255, 157, 0.8);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.cyber-gate.opening .gate-seam {
+    opacity: 0;
+    transition-delay: 0.3s;
+}
+
+.cyber-gate.closing .gate-seam {
+    opacity: 1;
+    animation: seamGlow 1.2s ease forwards;
+}
+
+@keyframes seamGlow {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Screen zoom effect */
+.cyber-gate.opening {
+    animation: zoomIn 1.2s ease forwards;
+}
+
+.cyber-gate.closing {
+    animation: zoomOut 1.2s ease forwards;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes zoomOut {
+    from {
+        transform: scale(1.05);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}

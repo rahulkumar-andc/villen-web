@@ -1,0 +1,238 @@
+.home-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    color: white;
+    padding-top: 80px;
+    /* Space for Navbar */
+}
+
+/* Background Handling */
+.home-bg_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.home-bg_overlay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.bg-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg,
+            rgba(5, 10, 9, 0.85) 0%,
+            rgba(5, 10, 9, 0.4) 50%,
+            rgba(5, 10, 9, 0.9) 100%);
+}
+
+/* Hero Section */
+.home-hero {
+    margin-bottom: 4rem;
+}
+
+.brand-title {
+    font-size: 5rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+    background: linear-gradient(to right, #fff, #b0bec5);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+    font-family: var(--font-mono);
+    color: var(--accent-primary);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.brand-desc {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin-bottom: 2rem;
+}
+
+.btn-glow {
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    padding: 0.8rem 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px;
+}
+
+.btn-glow:hover {
+    background: var(--accent-primary);
+    color: #000;
+    box-shadow: 0 0 20px var(--accent-primary);
+}
+
+/* Stats Row */
+.stats-row {
+    display: flex;
+    gap: 3rem;
+    margin-bottom: 4rem;
+    align-items: flex-end;
+}
+
+.stat-item {
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    padding-left: 1rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-text {
+    font-size: 1.1rem;
+    line-height: 1.2;
+}
+
+.highlight {
+    color: var(--accent-primary);
+    font-weight: 700;
+}
+
+.thm {
+    color: white;
+    font-weight: 600;
+}
+
+/* Glass Grid */
+.glass-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    height: 220px;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--accent-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 0 10px var(--accent-primary);
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(0, 255, 157, 0.3);
+}
+
+.glass-card:hover::before {
+    opacity: 1;
+}
+
+.card-icon {
+    color: var(--accent-primary);
+    margin-bottom: auto;
+}
+
+.glass-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.glass-card p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 1rem;
+}
+
+.card-arrow {
+    align-self: flex-end;
+    color: var(--text-muted);
+    transition: color 0.3s;
+}
+
+.glass-card:hover .card-arrow {
+    color: var(--accent-primary);
+}
+
+/* Footer */
+.home-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .brand-title {
+        font-size: 3rem;
+    }
+
+    .stats-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .home-footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
