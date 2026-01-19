@@ -79,4 +79,9 @@ npm run dev
 ## 👤 Author
 
 **VILLEN** - Security Researcher & Developer
-# villen-web
+
+## 🚢 Deployment
+
+For detailed instructions on deploying to **Vercel** (Frontend) and **PythonAnywhere** (Backend) with **villen.me** domain configuration, see:
+👉 [DEPLOY_GUIDE_VILLEN.md](DEPLOY_GUIDE_VILLEN.md)
+
