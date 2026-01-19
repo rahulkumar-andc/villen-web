@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ScrollReveal from '../../components/ScrollReveal';
 import { useAuth } from '../../context/AuthContext';
 import { Eye, AlertCircle, CheckCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../api/config';
 import '../admin/Admin.css';
 
 export const MonitorDashboard = () => {
@@ -10,7 +11,7 @@ export const MonitorDashboard = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/dashboard/monitor/', {
+        fetch(`${API_BASE_URL}/dashboard/monitor/`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())

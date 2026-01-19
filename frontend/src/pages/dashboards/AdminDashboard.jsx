@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ScrollReveal from '../../components/ScrollReveal';
 import { useAuth } from '../../context/AuthContext';
 import { Users, UserPlus, Flag } from 'lucide-react';
+import { API_BASE_URL } from '../../api/config';
 import '../admin/Admin.css';
 
 export const AdminDashboard = () => {
@@ -10,7 +11,7 @@ export const AdminDashboard = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/dashboard/admin/', {
+        fetch(`${API_BASE_URL}/dashboard/admin/`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())

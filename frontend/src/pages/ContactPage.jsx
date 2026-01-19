@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../api/config';
 import './ContactPage.css';
 import ScrollReveal from '../components/ScrollReveal';
 import { Send, Terminal } from 'lucide-react';
@@ -12,7 +13,7 @@ export const ContactPage = () => {
         setLoading(true);
         setStatus('Transmitting...');
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/contact/', {
+            const res = await fetch(`${API_BASE_URL}/contact/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

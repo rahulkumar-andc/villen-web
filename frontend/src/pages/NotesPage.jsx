@@ -3,6 +3,7 @@ import './NotesPage.css';
 import ScrollReveal from '../components/ScrollReveal';
 import { Save, FileText, Clock, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../api/config';
 
 export const NotesPage = () => {
     const [notes, setNotes] = useState([]);
@@ -12,7 +13,7 @@ export const NotesPage = () => {
     const { user } = useAuth(); // Get auth user
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/notes/')
+        fetch(`${API_BASE_URL}/notes/`)
             .then(res => res.json())
             .then(data => {
                 setNotes(data);
@@ -28,7 +29,7 @@ export const NotesPage = () => {
         if (!input.trim()) return;
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch('http://127.0.0.1:8000/api/notes/', {
+            const res = await fetch(`${API_BASE_URL}/notes/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

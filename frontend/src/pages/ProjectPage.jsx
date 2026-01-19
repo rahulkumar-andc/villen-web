@@ -2,15 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ExternalLink, Github, Loader } from 'lucide-react';
 import './ProjectPage.css';
 import ScrollReveal from '../components/ScrollReveal';
-import { blogAPI } from '../api/blog'; // We can share the axios instance or create a new one.
-// Let's assume we want to use the standard fetch for now or reuse the axios instance if available.
-// I'll use standard fetch to minimize dependency on the specific blogAPI helper, 
-// or I can quickly create a `projectsAPI` helper. 
-// For speed, let's use direct fetch but pointing to the correct relative URL if proxy is set, or absolute.
-// Given previous code used localhost:8000, I'll stick to relative `/api/projects/` assuming proxy or CORS.
-// Actually, earlier NotesPage used http://127.0.0.1:8000. Let's make it robust.
-
-const API_URL = 'http://127.0.0.1:8000/api';
+import { API_BASE_URL } from '../api/config';
 
 export const ProjectPage = () => {
     const [projects, setProjects] = useState([]);
@@ -18,7 +10,7 @@ export const ProjectPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch(`${API_URL}/projects/`)
+        fetch(`${API_BASE_URL}/projects/`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch projects');
                 return res.json();

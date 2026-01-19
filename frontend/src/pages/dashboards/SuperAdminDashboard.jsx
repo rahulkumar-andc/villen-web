@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ScrollReveal from '../../components/ScrollReveal';
 import { useAuth } from '../../context/AuthContext';
 import { Shield, Users, Activity, Lock, Server } from 'lucide-react';
+import { API_BASE_URL } from '../../api/config';
 import '../admin/Admin.css'; // Reuse existing admin styles
 
 export const SuperAdminDashboard = () => {
@@ -10,7 +11,7 @@ export const SuperAdminDashboard = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/dashboard/super/', {
+        fetch(`${API_BASE_URL}/dashboard/super/`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
