@@ -83,13 +83,43 @@ def seed():
         BlogCategory.objects.get_or_create(slug=c['slug'], defaults=c)
     print(f"✅ Created {len(categories)} blog categories")
 
-    # 4. Superuser (Ensure exists)
-    if not User.objects.filter(username='admin').exists():
-        u = User.objects.create_superuser('admin', 'admin@villen.me', 'admin123')
-        # Create profile
-        role, _ = Role.objects.get_or_create(name='Super Admin', level=1, role_type='SYSTEM')
-        UserProfile.objects.create(user=u, role=role, is_verified=True)
-        print("✅ Created superuser: admin / admin123")
+    # 4. Roles & Users
+    roles_data = [
+        {'name': 'Super Admin', 'level': 1, 'type': 'SYSTEM'},
+        {'name': 'Admin', 'level': 2, 'type': 'SYSTEM'},
+        {'name': 'Monitor', 'level': 3, 'type': 'SYSTEM'},
+        {'name': 'Premium User', 'level': 5, 'type': 'USER'},
+        {'name': 'Normal User', 'level': 6, 'type': 'USER'},
+    ]
+    
+    for r in roles_data:
+        Role.objects.get_or_create(name=r['name'], defaults={
+            'level': r['level'], 
+            'role_type': r['type']
+        })
+    print("✅ Created Roles")
+
+    # Define Users
+    users = [
+        {'user': 'admin', 'email': 'admin@villen.me', 'pass': 'admin123', 'role': 'Super Admin'},
+        {'user': 'manager', 'email': 'manager@villen.me', 'pass': 'manager123', 'role': 'Admin'},
+        {'user': 'mod', 'email': 'mod@villen.me', 'pass': 'mod123', 'role': 'Monitor'},
+        {'user': 'subscriber', 'email': 'sub@villen.me', 'pass': 'sub123', 'role': 'Premium User'},
+    ]
+
+    for u_data in users:
+        if not User.objects.filter(username=u_data['user']).exists():
+            user = User.objects.create_user(u_data['user'], u_data['email'], u_data['pass'])
+            role = Role.objects.get(name=u_data['role'])
+            UserProfile.objects.create(user=user, role=role, is_verified=True)
+            print(f"✅ Created user: {u_data['user']} ({u_data['role']})")
+        else:
+            # Ensure role is correct if user exists
+            user = User.objects.get(username=u_data['user'])
+            if not hasattr(user, 'profile'):
+                 role = Role.objects.get(name=u_data['role'])
+                 UserProfile.objects.create(user=user, role=role, is_verified=True)
+
 
 if __name__ == '__main__':
     seed()

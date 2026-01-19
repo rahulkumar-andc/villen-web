@@ -54,6 +54,7 @@ export function AuthProvider({ children }) {
 
     const value = {
         user,
+        token: localStorage.getItem('accessToken'), // Expose token
         loading,
         isAuthenticated: !!user,
         login,

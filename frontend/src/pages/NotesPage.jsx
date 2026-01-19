@@ -78,38 +78,38 @@ export const NotesPage = () => {
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </ScrollReveal>
-            ) : (
-            <ScrollReveal>
-                <div className="login-hint">
-                    <p>Authenticate to add entries.</p>
-                </div>
-            </ScrollReveal>
-                )}
 
-            <div className="notes-grid">
-                {notes.map(note => (
-                    <ScrollReveal key={note.id} className="note-card-wrapper">
-                        <div className="note-card">
-                            <div className="note-meta">
-                                <Clock size={14} />
-                                {new Date(note.created_at).toLocaleString()}
-                            </div>
-                            <div className="note-body">
-                                <p>{note.body}</p>
-                            </div>
-                            <div className="note-footer">
-                                <FileText size={14} /> Classified
-                            </div>
+                    </ScrollReveal>
+                ) : (
+                    <ScrollReveal>
+                        <div className="login-hint">
+                            <p>Authenticate to add entries.</p>
                         </div>
                     </ScrollReveal>
-                ))}
-                {notes.length === 0 && !loading && !error && (
-                    <div className="empty-state">No intel collected yet.</div>
                 )}
+
+                <div className="notes-grid">
+                    {notes.map(note => (
+                        <ScrollReveal key={note.id} className="note-card-wrapper">
+                            <div className="note-card">
+                                <div className="note-meta">
+                                    <Clock size={14} />
+                                    {new Date(note.created_at).toLocaleString()}
+                                </div>
+                                <div className="note-body">
+                                    <p>{note.body}</p>
+                                </div>
+                                <div className="note-footer">
+                                    <FileText size={14} /> Classified
+                                </div>
+                            </div>
+                        </ScrollReveal>
+                    ))}
+                    {notes.length === 0 && !loading && !error && (
+                        <div className="empty-state">No intel collected yet.</div>
+                    )}
+                </div>
             </div>
-        </div>
         </div >
     );
 };

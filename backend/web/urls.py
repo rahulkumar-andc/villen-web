@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/auth/', include('api.auth_urls')),
     path('api/blog/', include('api.blog_urls')),
     path('api/', include('api.core_urls')), # Core endpoints (Projects, Notes)
+    path('api/dashboard/', include('api.dashboard_urls')), # Role-based Dashboards
 ]
 

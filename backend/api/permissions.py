@@ -1,112 +1,48 @@
-from functools import wraps
-from django.http import JsonResponse
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
-
-# ============================================================
-# DRF Permission Classes
-# ============================================================
-
-class IsSystemLevel(BasePermission):
+class IsSuperAdmin(permissions.BasePermission):
     """
-    Allows access only to System Level users (Super Admin, Admin, Monitor).
+    Level 1: Super Admin (System Owner).
     """
-    message = "System level access required."
-
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        profile = getattr(request.user, 'profile', None)
-        if not profile or not profile.role:
+        if not hasattr(request.user, 'profile') or not request.user.profile.role:
             return False
-        return profile.role.level <= 3  # MONITOR and above
+        return request.user.profile.role.level == 1
 
-
-class IsApplicationLevel(BasePermission):
+class IsAdmin(permissions.BasePermission):
     """
-    Allows access to Application Level and above (includes Developers).
+    Level 2: Admin (Operations Manager).
+    access: Super Admin (1) and Admin (2).
     """
-    message = "Application level access required."
-
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        profile = getattr(request.user, 'profile', None)
-        if not profile or not profile.role:
+        if not hasattr(request.user, 'profile') or not request.user.profile.role:
             return False
-        return profile.role.level <= 4  # DEVELOPER and above
+        return request.user.profile.role.level <= 2
 
-
-class IsPremiumUser(BasePermission):
+class IsMonitor(permissions.BasePermission):
     """
-    Allows access to Premium users and above.
+    Level 3: Monitor (Moderator).
+    access: Level 1, 2, and 3.
     """
-    message = "Premium access required."
-
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        profile = getattr(request.user, 'profile', None)
-        if not profile or not profile.role:
+        if not hasattr(request.user, 'profile') or not request.user.profile.role:
             return False
-        return profile.role.level <= 5  # PREMIUM and above
+        return request.user.profile.role.level <= 3
 
-
-class IsNormalUser(BasePermission):
+class IsPremium(permissions.BasePermission):
     """
-    Allows access to any registered user (Normal and above).
+    Level 5: Premium User.
+    access: Level 1-5.
     """
-    message = "Authentication required."
-
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        profile = getattr(request.user, 'profile', None)
-        if not profile or not profile.role:
+        if not hasattr(request.user, 'profile') or not request.user.profile.role:
             return False
-        return profile.role.level <= 6  # NORMAL and above
-
-
-# ============================================================
-# Function-Based View Decorators
-# ============================================================
-
-def role_required(min_level):
-    """
-    Decorator for function-based views.
-    Usage: @role_required(Role.PREMIUM)
-    """
-    def decorator(view_func):
-        @wraps(view_func)
-        def wrapper(request, *args, **kwargs):
-            if not request.user.is_authenticated:
-                return JsonResponse({'error': 'Authentication required'}, status=401)
-            
-            profile = getattr(request.user, 'profile', None)
-            if not profile or not profile.role:
-                return JsonResponse({'error': 'No role assigned'}, status=403)
-            
-            if profile.role.level > min_level:
-                return JsonResponse({'error': 'Insufficient permissions'}, status=403)
-            
-            return view_func(request, *args, **kwargs)
-        return wrapper
-    return decorator
-
-
-# ============================================================
-# Utility Functions
-# ============================================================
-
-def get_user_role(user):
-    """Get user's role or None."""
-    if not user.is_authenticated:
-        return None
-    profile = getattr(user, 'profile', None)
-    return profile.role if profile else None
-
-
-def get_user_level(user):
-    """Get user's role level (7 for guest/unauthenticated)."""
-    role = get_user_role(user)
-    return role.level if role else 7
+        return request.user.profile.role.level <= 5

@@ -270,3 +270,35 @@ class ContactMessage(models.Model):
 
 
 
+
+class AuditLog(models.Model):
+    """
+    Security and action logs for Super Admin / Monitor.
+    """
+    ACTION_CHOICES = [
+        ('LOGIN', 'Login'),
+        ('LOGIN_FAILED', 'Login Failed'),
+        ('LOGOUT', 'Logout'),
+        ('REGISTER', 'Register'),
+        ('ROLE_CHANGE', 'Role Change'),
+        ('BAN_USER', 'Ban User'),
+        ('UNBAN_USER', 'Unban User'),
+        ('DELETE_CONTENT', 'Delete Content'),
+        ('FLAG_CONTENT', 'Flag Content'),
+        ('PASSWORD_RESET', 'Password Reset'),
+        ('SYSTEM_CONFIG', 'System Config Change'),
+    ]
+
+    actor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='audit_logs_actor')
+    target_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='audit_logs_target')
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    details = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        actor_name = self.actor.username if self.actor else 'System'
+        return f"{self.created_at} - {actor_name} - {self.action}"
