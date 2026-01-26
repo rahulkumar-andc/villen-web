@@ -157,6 +157,8 @@ class BlogCategory(models.Model):
 
 class BlogPost(models.Model):
     """Blog posts with access control."""
+    WORDS_PER_MINUTE = 200  # Average reading speed
+    
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     excerpt = models.TextField(max_length=500)
@@ -170,6 +172,7 @@ class BlogPost(models.Model):
     min_role_level = models.PositiveIntegerField(default=7, help_text="Min role level required (7=Guest, 5=Premium)")
     
     reading_time_mins = models.PositiveIntegerField(default=5)
+    word_count = models.PositiveIntegerField(default=0, help_text="Total word count")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -189,6 +192,29 @@ class BlogPost(models.Model):
         if not profile or not profile.role:
             return False
         return profile.role.level <= self.min_role_level
+    
+    def calculate_reading_time(self):
+        """Calculate reading time based on word count."""
+        words = self.content.split()
+        word_count = len(words)
+        reading_time = max(1, round(word_count / self.WORDS_PER_MINUTE))
+        return reading_time, word_count
+    
+    def update_reading_time(self):
+        """Update reading_time_mins and word_count."""
+        reading_time, word_count = self.calculate_reading_time()
+        self.reading_time_mins = reading_time
+        self.word_count = word_count
+        self.save(update_fields=['reading_time_mins', 'word_count', 'updated_at'])
+        return reading_time
+    
+    def save(self, *args, **kwargs):
+        """Override save to auto-calculate reading time."""
+        if not self.word_count or self.content:
+            reading_time, word_count = self.calculate_reading_time()
+            self.reading_time_mins = reading_time
+            self.word_count = word_count
+        super().save(*args, **kwargs)
 
 
 # =============================================================================
@@ -328,6 +354,123 @@ class BlogComment(models.Model):
 
 
 # =============================================================================
+# Blog Reactions
+# =============================================================================
+
+class PostReaction(models.Model):
+    """
+    Reactions to blog posts (like, insightful, helpful, etc.)
+    Allows multiple reaction types per user per post.
+    """
+    REACTION_CHOICES = [
+        ('like', '👍 Like'),
+        ('insightful', '💡 Insightful'),
+        ('helpful', '📚 Helpful'),
+        ('interesting', '🎯 Interesting'),
+        ('confusing', '❓ Confusing'),
+    ]
+    
+    REACTION_EMOJI = {
+        'like': '👍',
+        'insightful': '💡',
+        'helpful': '📚',
+        'interesting': '🎯',
+        'confusing': '❓',
+    }
+
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='reactions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_reactions', null=True, blank=True)
+    guest_id = models.CharField(max_length=64, blank=True, null=True, help_text="Anonymous user ID for guests")
+    reaction = models.CharField(max_length=20, choices=REACTION_CHOICES)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['post', 'reaction']),
+            models.Index(fields=['user', 'post']),
+        ]
+        # Each user can only have one reaction per type per post
+        constraints = [
+            models.UniqueConstraint(
+                fields=['post', 'user', 'reaction'],
+                name='unique_user_reaction_per_post'
+            ),
+            models.UniqueConstraint(
+                fields=['post', 'guest_id', 'reaction'],
+                name='unique_guest_reaction_per_post'
+            ),
+        ]
+
+    def __str__(self):
+        user_or_guest = self.user.username if self.user else f"Guest:{self.guest_id[:8]}"
+        return f"{user_or_guest} reacted {self.reaction} to '{self.post.title}'"
+
+    @classmethod
+    def get_reaction_counts(cls, post):
+        """Get count of each reaction type for a post."""
+        from django.db.models import Count
+        reactions = cls.objects.filter(post=post).values('reaction').annotate(
+            count=Count('id')
+        )
+        return {r['reaction']: r['count'] for r in reactions}
+
+    @classmethod
+    def get_user_reactions(cls, post, user):
+        """Get all reaction types the user has used for this post."""
+        if user and user.is_authenticated:
+            return cls.objects.filter(post=post, user=user).values_list('reaction', flat=True)
+        return []
+
+    @property
+    def emoji(self):
+        return self.REACTION_EMOJI.get(self.reaction, '👍')
+
+
+class ReactionSummary(models.Model):
+    """
+    Cached reaction summary for fast retrieval.
+    Updated periodically or when reactions change.
+    """
+    post = models.OneToOneField(BlogPost, on_delete=models.CASCADE, related_name='reaction_summary')
+    like_count = models.PositiveIntegerField(default=0)
+    insightful_count = models.PositiveIntegerField(default=0)
+    helpful_count = models.PositiveIntegerField(default=0)
+    interesting_count = models.PositiveIntegerField(default=0)
+    confusing_count = models.PositiveIntegerField(default=0)
+    total_reactions = models.PositiveIntegerField(default=0)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-total_reactions']
+
+    def __str__(self):
+        return f"Reactions for '{self.post.title}': {self.total_reactions}"
+
+    def update_counts(self):
+        """Update counts from actual reactions."""
+        counts = PostReaction.get_reaction_counts(self.post)
+        self.like_count = counts.get('like', 0)
+        self.insightful_count = counts.get('insightful', 0)
+        self.helpful_count = counts.get('helpful', 0)
+        self.interesting_count = counts.get('interesting', 0)
+        self.confusing_count = counts.get('confusing', 0)
+        self.total_reactions = sum(counts.values())
+        self.save()
+
+    def to_dict(self):
+        return {
+            'like': self.like_count,
+            'insightful': self.insightful_count,
+            'helpful': self.helpful_count,
+            'interesting': self.interesting_count,
+            'confusing': self.confusing_count,
+            'total': self.total_reactions,
+        }
+
+
+# =============================================================================
 # Analytics
 # =============================================================================
 
@@ -359,3 +502,77 @@ class DailyStats(models.Model):
 
     def __str__(self):
         return f"Stats for {self.date}"
+
+
+# =============================================================================
+# API Security Models
+# =============================================================================
+
+class APIKey(models.Model):
+    """
+    API Key model for third-party integrations.
+    Supports HMAC-SHA256 validation and rate limiting.
+    """
+    SCOPES = [
+        ('read', 'Read Only'),
+        ('write', 'Read and Write'),
+        ('admin', 'Full Access'),
+    ]
+
+    name = models.CharField(max_length=100, help_text="Descriptive name for the API key")
+    key = models.CharField(max_length=64, unique=True, help_text="HMAC-SHA256 API key")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='api_keys')
+    scopes = models.JSONField(default=list, help_text="List of allowed scopes")
+    is_active = models.BooleanField(default=True)
+    rate_limit = models.PositiveIntegerField(default=1000, help_text="Requests per hour")
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_used = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True, help_text="Optional expiration date")
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "API Key"
+        verbose_name_plural = "API Keys"
+
+    def __str__(self):
+        return f"{self.name} - {self.user.username}"
+
+    def is_expired(self):
+        """Check if the API key has expired."""
+        from django.utils import timezone
+        if self.expires_at and timezone.now() > self.expires_at:
+            return True
+        return False
+
+    def has_scope(self, scope):
+        """Check if API key has the required scope."""
+        return scope in self.scopes
+
+    def update_last_used(self):
+        """Update the last used timestamp."""
+        from django.utils import timezone
+        self.last_used = timezone.now()
+        self.save(update_fields=['last_used'])
+
+
+class APIKeyUsage(models.Model):
+    """
+    Track API key usage for rate limiting and analytics.
+    """
+    api_key = models.ForeignKey(APIKey, on_delete=models.CASCADE, related_name='usage')
+    endpoint = models.CharField(max_length=255)
+    method = models.CharField(max_length=10)
+    status_code = models.PositiveIntegerField()
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.TextField(blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['api_key', 'timestamp']),
+            models.Index(fields=['timestamp']),
+        ]
+
+    def __str__(self):
+        return f"{self.api_key.name} - {self.endpoint} - {self.timestamp}"

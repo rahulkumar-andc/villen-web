@@ -70,6 +70,9 @@ MIDDLEWARE = [
     'api.security_middleware.SecurityHeadersMiddleware',
     'api.security_middleware.RateLimitExceededMiddleware',
     'api.security_middleware.IPWhitelistMiddleware',
+    # Enhanced logging middleware
+    'api.middleware.correlation_id.CorrelationIdMiddleware',
+    'api.middleware.correlation_id.RequestLoggingMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in development
@@ -214,7 +217,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.auth_backends.APIKeyAuthentication',  # API Key authentication
     ),
+    'DEFAULT_VERSIONING_CLASS': 'api.versioning.AcceptHeaderVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1'],
+    'VERSION_PARAM': 'version',
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
@@ -260,22 +268,29 @@ DEFAULT_FROM_EMAIL = 'noreply@shadowlayer.local'
 
 
 # =============================================================================
-# Logging Configuration
+# Enhanced Logging Configuration with Correlation IDs
 # =============================================================================
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {correlation_id} {message}',
             'style': '{',
         },
+        'json': {
+            'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(asctime)s %(name)s %(levelname)s %(correlation_id)s %(user_id)s %(ip)s %(method)s %(path)s %(status_code)s %(message)s',
+        },
         'simple': {
-            'format': '{levelname} {asctime} {message}',
+            'format': '{levelname} {asctime} {correlation_id} {message}',
             'style': '{',
         },
     },
     'filters': {
+        'correlation_id': {
+            '()': 'api.middleware.correlation_id.CorrelationIdFilter',
+        },
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse',
         },
@@ -287,19 +302,29 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'simple',
+            'filters': ['correlation_id'],
         },
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs' / 'django.log',
             'formatter': 'verbose',
+            'filters': ['correlation_id'],
         },
         'security_file': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs' / 'security.log',
             'formatter': 'verbose',
+            'filters': ['correlation_id'],
+        },
+        'api_json': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'api.log',
+            'formatter': 'json',
+            'filters': ['correlation_id'],
         },
     },
     'loggers': {
@@ -314,7 +339,7 @@ LOGGING = {
             'propagate': False,
         },
         'api': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file', 'api_json'],
             'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': False,
         },

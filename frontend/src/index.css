@@ -4,6 +4,7 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Default Dark Theme */
 :root {
   --bg-primary: #050a09;
   --bg-secondary: #0c1412;
@@ -22,6 +23,64 @@ html {
   --font-mono: 'Roboto Mono', monospace;
 
   --border-color: #1a2e29;
+  
+  /* Glass morphism */
+  --glass-bg: rgba(12, 20, 18, 0.8);
+  --glass-border: rgba(0, 255, 157, 0.1);
+}
+
+/* Light Theme Override */
+[data-theme="light"],
+.light-mode {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e9ecef;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
+
+  --accent-primary: #0066cc;
+  --accent-secondary: #0052a3;
+  --accent-dim: rgba(0, 102, 204, 0.1);
+  --accent-glow: 0 0 20px rgba(0, 102, 204, 0.3);
+
+  --border-color: #dee2e6;
+  
+  /* Glass morphism */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 102, 204, 0.15);
+}
+
+/* Utility classes for theme states */
+.dark-mode {
+  --bg-primary: #050a09;
+  --bg-secondary: #0c1412;
+  --bg-tertiary: #111f1c;
+  --text-primary: #e0f2eb;
+  --text-secondary: #94a39f;
+  --text-muted: #5c6663;
+  --accent-primary: #00ff9d;
+  --accent-secondary: #00cc7d;
+  --accent-dim: rgba(0, 255, 157, 0.1);
+  --border-color: #1a2e29;
+  --glass-bg: rgba(12, 20, 18, 0.8);
+  --glass-border: rgba(0, 255, 157, 0.1);
+}
+
+.light-mode {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #1a1a1a;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
+  --accent-primary: #0066cc;
+  --accent-secondary: #0052a3;
+  --accent-dim: rgba(0, 102, 204, 0.1);
+  --border-color: #dee2e6;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 102, 204, 0.15);
 }
 
 * {
@@ -36,6 +95,18 @@ body {
   font-family: var(--font-main);
   line-height: 1.6;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth theme transition */
+body,
+html,
+.app-container,
+.page-container,
+.glass-card,
+.navbar,
+.footer {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 a {

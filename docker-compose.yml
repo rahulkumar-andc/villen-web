@@ -77,26 +77,51 @@ services:
     networks:
       - villen-network
 
-  # Nginx Reverse Proxy (Optional but recommended)
+  # Nginx WAF Reverse Proxy with Security
   nginx:
     image: nginx:latest
-    container_name: villen-nginx
+    container_name: villen-nginx-waf
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/waf-rules.conf:/etc/nginx/waf-rules.conf:ro
+      - ./nginx/api-waf-rules.conf:/etc/nginx/api-waf-rules.conf:ro
+      - ./nginx/security-monitoring.conf:/etc/nginx/security-monitoring.conf:ro
+      - ./nginx/ssl-config.conf:/etc/nginx/ssl-config.conf:ro
+      - ./nginx/upstream.conf:/etc/nginx/upstream.conf:ro
+      - ./nginx/rate-limiting.conf:/etc/nginx/rate-limiting.conf:ro
+      - ./nginx/security-headers.conf:/etc/nginx/security-headers.conf:ro
       - backend_static:/app/staticfiles:ro
+      - nginx_logs:/var/log/nginx
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    environment:
+      - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
     depends_on:
       - backend
       - frontend
     networks:
       - villen-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:mode=755,size=100m
+      - /var/run:mode=755,size=10m
+      - /tmp:mode=755,size=50m
 
 volumes:
   postgres_data:
   backend_logs:
   backend_static:
+  nginx_logs:
 
 networks:
   villen-network:

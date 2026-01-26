@@ -1,90 +1,129 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useTheme } from '../hooks/useTheme';
 import './ThemeToggle.css';
 
-const ThemeToggle = ({ showLabels = true }) => {
-  const [theme, setTheme] = useState(() => {
-    // Check localStorage or system preference
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
+const ThemeToggle = ({ variant = 'icon', showLabel = false, className = '' }) => {
+  const { theme, setTheme, toggleTheme, isDark, isSystem } = useTheme();
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    // Apply theme to document
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    setIsAnimating(true);
+    const timer = setTimeout(() => setIsAnimating(false), 300);
+    return () => clearTimeout(timer);
+  }, [isDark]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  const handleClick = () => {
+    toggleTheme();
   };
 
-  return (
-    <button
-      className="theme-toggle"
-      onClick={toggleTheme}
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-      title={`Current: ${theme} mode`}
-    >
-      <motion.div
-        className="toggle-track"
-        animate={{ backgroundColor: theme === 'dark' ? '#1a2e29' : '#e0f2eb' }}
-        transition={{ duration: 0.3 }}
-      >
-        <motion.div
-          className="toggle-thumb"
-          animate={{ x: theme === 'dark' ? 24 : 2 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
+  const getThemeLabel = () => {
+    if (theme === 'system') return 'System';
+    return isDark ? 'Dark' : 'Light';
+  };
+
+  if (variant === 'dropdown') {
+    return (
+      <div className={`theme-toggle dropdown ${className}`}>
+        <button 
+          className={`theme-toggle-btn ${isAnimating ? 'animating' : ''}`}
+          onClick={handleClick}
+          aria-label={`Current theme: ${getThemeLabel()}. Click to toggle.`}
         >
-          {theme === 'dark' ? (
-            <Moon size={14} />
-          ) : (
-            <Sun size={14} />
-          )}
-        </motion.div>
-      </motion.div>
-      {showLabels && (
-        <span className="theme-label">
-          {theme === 'dark' ? 'Dark' : 'Light'}
-        </span>
-      )}
-    </button>
-  );
-};
-
-// Context for theme management
-export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('theme');
-    return saved || 'dark';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
-
-const ThemeContext = React.createContext(null);
-
-export const useTheme = () => {
-  const context = React.useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+          <span className="theme-icon">
+            {isDark ? '🌙' : '☀️'}
+          </span>
+          <span className="theme-label">{getThemeLabel()}</span>
+          <span className="dropdown-arrow">▼</span>
+        </button>
+        <div className="theme-dropdown">
+          <button 
+            className={`dropdown-item ${theme === 'dark' ? 'active' : ''}`}
+            onClick={() => setTheme('dark')}
+          >
+            <span className="item-icon">🌙</span>
+            <span className="item-text">Dark</span>
+            {theme === 'dark' && <span className="check">✓</span>}
+          </button>
+          <button 
+            className={`dropdown-item ${theme === 'light' ? 'active' : ''}`}
+            onClick={() => setTheme('light')}
+          >
+            <span className="item-icon">☀️</span>
+            <span className="item-text">Light</span>
+            {theme === 'light' && <span className="check">✓</span>}
+          </button>
+          <button 
+            className={`dropdown-item ${theme === 'system' ? 'active' : ''}`}
+            onClick={() => setTheme('system')}
+          >
+            <span className="item-icon">💻</span>
+            <span className="item-text">System</span>
+            {theme === 'system' && <span className="check">✓</span>}
+          </button>
+        </div>
+      </div>
+    );
   }
-  return context;
+
+  if (variant === 'segmented') {
+    return (
+      <div className={`theme-toggle segmented ${className}`}>
+        <button 
+          className={`segment-btn ${theme === 'dark' ? 'active' : ''}`}
+          onClick={() => setTheme('dark')}
+          aria-label="Switch to dark mode"
+        >
+          <span className="segment-icon">🌙</span>
+          <span className="segment-text">Dark</span>
+        </button>
+        <button 
+          className={`segment-btn ${theme === 'system' ? 'active' : ''}`}
+          onClick={() => setTheme('system')}
+          aria-label="Use system preference"
+        >
+          <span className="segment-icon">💻</span>
+          <span className="segment-text">System</span>
+        </button>
+        <button 
+          className={`segment-btn ${theme === 'light' ? 'active' : ''}`}
+          onClick={() => setTheme('light')}
+          aria-label="Switch to light mode"
+        >
+          <span className="segment-icon">☀️</span>
+          <span className="segment-text">Light</span>
+        </button>
+      </div>
+    );
+  }
+
+  // Default: icon only with tooltip
+  return (
+    <div className={`theme-toggle icon-only ${className}`}>
+      <button 
+        className={`theme-toggle-btn icon ${isAnimating ? 'animating' : ''}`}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        aria-label={`Current theme: ${getThemeLabel()}. Click to toggle.`}
+        title={`Current: ${getThemeLabel()} (Click to toggle)`}
+      >
+        <span className="toggle-track">
+          <span className={`toggle-thumb ${isDark ? 'dark' : 'light'}`}>
+            {isDark ? '🌙' : '☀️'}
+          </span>
+        </span>
+      </button>
+      {showLabel && (
+        <span className="theme-toggle-label">{getThemeLabel()}</span>
+      )}
+    </div>
+  );
 };
 
 export default ThemeToggle;

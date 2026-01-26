@@ -67,6 +67,41 @@ class SecurityHeadersMiddleware:
         response['Referrer-Policy'] = 'strict-origin-when-cross-origin'
         
         # ============================================================
+        # Content Security Policy (CSP)
+        # ============================================================
+        if settings.DEBUG:
+            # Development CSP - more permissive
+            csp_directives = [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5173 https://localhost:5173",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "font-src 'self' https://fonts.gstatic.com",
+                "img-src 'self' data: https: blob:",
+                "connect-src 'self' http://localhost:5173 https://localhost:5173 ws://localhost:5173 wss://localhost:5173",
+                "frame-ancestors 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+                "upgrade-insecure-requests",
+            ]
+        else:
+            # Production CSP - strict
+            csp_directives = [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline'",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "font-src 'self' https://fonts.gstatic.com",
+                "img-src 'self' data: https:",
+                "connect-src 'self'",
+                "frame-ancestors 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+                "upgrade-insecure-requests",
+                "block-all-mixed-content",
+            ]
+        
+        response['Content-Security-Policy'] = '; '.join(csp_directives)
+        
+        # ============================================================
         # Permissions Policy (Feature Policy)
         # ============================================================
         response['Permissions-Policy'] = (
