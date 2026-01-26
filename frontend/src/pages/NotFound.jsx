@@ -52,7 +52,7 @@ const NotFound = () => {
             <span className="control-dot green" />
           </div>
         </div>
-        
+
         <div className="terminal-content">
           <div className="error-code">
             <h1 className="glitch" data-text="404">404</h1>
@@ -62,7 +62,7 @@ const NotFound = () => {
           <div className="terminal-output">
             {terminalLines.map((line, index) => (
               <div key={index} className={`terminal-line ${line.type}`}>
-                <span className="prompt">></span>
+                <span className="prompt">&gt;</span>
                 {line.text}
               </div>
             ))}
@@ -82,7 +82,7 @@ const NotFound = () => {
                 </>
               )}
             </button>
-            
+
             {isSystemDown && (
               <div className="system-down-message">
                 <Cpu size={48} />
