@@ -101,14 +101,23 @@ WSGI_APPLICATION = 'web.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 import dj_database_url
-
 DATABASES = {
     "default": dj_database_url.config(
         default="sqlite:///db.sqlite3",
-        conn_max_age=0,          # Supabase pooler ke liye safe
-        ssl_require=True
+        conn_max_age=0,
+        ssl_require=False
     )
 }
+
+# Fallback for makemigrations in environments without psycopg2
+try:
+    import psycopg2
+except ImportError:
+    if 'postgresql' in DATABASES['default']['ENGINE']:
+        DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
 
 
 # Password validation
@@ -206,6 +215,12 @@ REST_FRAMEWORK = {
     },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ) if not DEBUG else (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
     'EXCEPTION_HANDLER': 'api.exceptions.custom_exception_handler',
 }
 

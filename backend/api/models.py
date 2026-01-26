@@ -241,6 +241,7 @@ class Project(models.Model):
 
 
 class Note(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes', null=True, blank=True)
     title = models.CharField(max_length=200, default='Field Note')
     body = models.TextField()
     is_public = models.BooleanField(default=True)

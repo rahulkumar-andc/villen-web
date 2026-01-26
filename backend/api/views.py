@@ -4,9 +4,19 @@ from rest_framework.response import Response
 from .models import Note
 from .serializers import NoteSerializer
 
+from .permissions import IsOwner, IsAuthenticated
+
 class NoteViewSet(viewsets.ModelViewSet):
-    queryset = Note.objects.all().order_by('-created_at')
     serializer_class = NoteSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def get_queryset(self):
+        # Users can only see their own notes
+        return Note.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        # Auto-assign the current user as owner
+        serializer.save(user=self.request.user)
 
 @api_view(['POST'])
 def contact_api(request):
