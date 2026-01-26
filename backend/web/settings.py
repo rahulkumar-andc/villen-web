@@ -124,12 +124,22 @@ except ImportError:
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 # Password Hashing - Use Argon2 (more secure than default PBKDF2)
-PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-]
+# Password Hashing
+try:
+    import argon2
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.Argon2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    ]
+except ImportError:
+    # Fallback to PBKDF2 if Argon2 is not installed
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    ]
 
 # Enhanced Password Validation - Enforce 12+ character passwords
 AUTH_PASSWORD_VALIDATORS = [

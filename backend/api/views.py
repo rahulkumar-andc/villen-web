@@ -4,11 +4,12 @@ from rest_framework.response import Response
 from .models import Note
 from .serializers import NoteSerializer
 
-from .permissions import IsOwner, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwner
 
 class NoteViewSet(viewsets.ModelViewSet):
     serializer_class = NoteSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         # Users can only see their own notes

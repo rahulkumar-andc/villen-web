@@ -5,7 +5,7 @@ from .health import health_check, version
 from .rss import rss_feed
 
 router = DefaultRouter()
-router.register(r'notes', NoteViewSet)
+router.register(r'notes', NoteViewSet, basename='note')
 
 urlpatterns = [
     path('', include(router.urls)),
