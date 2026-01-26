@@ -302,3 +302,59 @@ class AuditLog(models.Model):
     def __str__(self):
         actor_name = self.actor.username if self.actor else 'System'
         return f"{self.created_at} - {actor_name} - {self.action}"
+
+
+# =============================================================================
+# Blog Comments
+# =============================================================================
+
+class BlogComment(models.Model):
+    """Comments on blog posts."""
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='comments')
+    author_name = models.CharField(max_length=100, help_text="Name for guest commenters")
+    author_email = models.EmailField(blank=True, null=True)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='blog_comments')
+    is_approved = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Comment by {self.author_name} on {self.post.title}"
+
+
+# =============================================================================
+# Analytics
+# =============================================================================
+
+class PageView(models.Model):
+    """Track page views for analytics."""
+    path = models.CharField(max_length=255)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    referrer = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.path} - {self.created_at}"
+
+
+class DailyStats(models.Model):
+    """Daily aggregated statistics."""
+    date = models.DateField(unique=True)
+    total_visits = models.PositiveIntegerField(default=0)
+    unique_visitors = models.PositiveIntegerField(default=0)
+    total_page_views = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"Stats for {self.date}"

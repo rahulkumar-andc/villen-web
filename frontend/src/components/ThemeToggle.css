@@ -1,0 +1,72 @@
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.toggle-track {
+  width: 50px;
+  height: 26px;
+  border-radius: 13px;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 2px;
+  color: var(--bg-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Light theme CSS variables override */
+:root[data-theme="light"] {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e5e5e5;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #888888;
+  --border-color: #d4d4d4;
+  --accent-dim: rgba(0, 0, 0, 0.1);
+  --accent-glow: 0 0 15px rgba(0, 255, 157, 0.2);
+}
+
+/* Smooth transition for theme change */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Print styles */
+@media print {
+  .theme-toggle {
+    display: none !important;
+  }
+  
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #333333;
+  }
+}
+

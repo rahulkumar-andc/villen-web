@@ -1,0 +1,49 @@
+.reading-progress-container {
+  position: sticky;
+  top: 60px;
+  z-index: 100;
+  background: var(--bg-primary);
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reading-progress-bar {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--blog-accent));
+  transform-origin: 0%;
+}
+
+.reading-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reading-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reading-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.reading-stats .stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+

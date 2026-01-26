@@ -93,3 +93,230 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-secondary);
 }
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  /* Hide interactive elements */
+  nav,
+  .navbar,
+  .scanlines,
+  .terminal-overlay,
+  .back-to-top,
+  .custom-cursor,
+  .share-buttons,
+  .scroll-progress-bar,
+  .comments-section,
+  .related-posts-section,
+  .author-bio-card,
+  button,
+  .btn-transmit,
+  .btn-primary,
+  .btn-secondary,
+  form,
+  .contact-form,
+  .notes-input-card,
+  .login-hint,
+  footer {
+    display: none !important;
+  }
+
+  /* Reset colors for print */
+  :root {
+    --bg-primary: #ffffff !important;
+    --bg-secondary: #ffffff !important;
+    --bg-tertiary: #f5f5f5 !important;
+    --text-primary: #000000 !important;
+    --text-secondary: #333333 !important;
+    --text-muted: #666666 !important;
+    --border-color: #cccccc !important;
+    --accent-primary: #000000 !important;
+    --accent-dim: transparent !important;
+    --accent-glow: none !important;
+  }
+
+  /* Reset body */
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+  }
+
+  /* Page setup */
+  .page-container {
+    padding: 0;
+    min-height: auto;
+    animation: none;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+    page-break-after: avoid;
+    margin-bottom: 0.5em;
+  }
+
+  h1 {
+    font-size: 2rem;
+    border-bottom: 2px solid #000;
+    padding-bottom: 0.25em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 1em;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  /* Links */
+  a {
+    color: #000000 !important;
+    text-decoration: underline;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Code blocks */
+  pre, code {
+    background: #f5f5f5 !important;
+    border: 1px solid #ccc !important;
+    color: #000 !important;
+    page-break-inside: avoid;
+  }
+
+  pre {
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+
+  /* Tables */
+  table {
+    page-break-inside: avoid;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #ccc !important;
+    padding: 0.5em;
+    text-align: left;
+  }
+
+  /* Cards and sections */
+  .card,
+  .project-card,
+  .note-card,
+  .blog-post-content {
+    border: 1px solid #ccc !important;
+    background: #fff !important;
+    page-break-inside: avoid;
+  }
+
+  /* Page breaks */
+  h1, h2, h3 {
+    page-break-before: auto;
+  }
+
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Blog post specific */
+  .blog-post {
+    padding: 0;
+  }
+
+  .blog-post-header {
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+    border-bottom: 1px solid #000;
+  }
+
+  .blog-post-content {
+    padding: 1em 0;
+  }
+
+  /* Hide decorative elements */
+  .glitch::before,
+  .glitch::after {
+    display: none !important;
+  }
+
+  .subtitle {
+    color: #666 !important;
+  }
+
+  /* Ensure proper page breaks */
+  .page-container::before,
+  .page-container::after {
+    display: none !important;
+  }
+
+  /* Footer for print */
+  @page {
+    margin: 2cm;
+  }
+
+  @page :left {
+    margin-left: 2.5cm;
+  }
+
+  @page :right {
+    margin-right: 2.5cm;
+  }
+
+  /* Add URL after external links in content */
+  .blog-post-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.7em;
+  }
+
+  /* Show print date */
+  body::before {
+    content: "Printed on " attr(data-print-date);
+    display: block;
+    text-align: center;
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 1em;
+  }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

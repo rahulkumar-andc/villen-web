@@ -1,11 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
+import { QueryProvider } from './providers/QueryProvider'
+import ErrorBoundary from './components/ErrorBoundary'
 import LandingPage from './pages/LandingPage'
 import { HomePage, AboutPage, ProjectPage, ContactPage, NotesPage, MainPage } from './pages'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import NotFound from './pages/NotFound'
 import { BlogGateway, BlogHome, BlogPost } from './pages/blog'
 import { PostEditor } from './pages/admin'
 import { SuperAdminDashboard } from './pages/dashboards/SuperAdminDashboard'
@@ -14,7 +17,13 @@ import { MonitorDashboard } from './pages/dashboards/MonitorDashboard'
 import { PremiumDashboard } from './pages/dashboards/PremiumDashboard'
 import Navbar from './components/Navbar'
 import TerminalOverlay from './components/TerminalOverlay'
+import ScrollProgress from './components/ScrollProgress'
+import BackToTop from './components/BackToTop'
+import CustomCursor from './components/CustomCursor'
+import PageTransition from './components/PageTransition'
+import { SkeletonLoader } from './components/SkeletonLoader'
 import './pages/Pages.css'
+import './components/MicroInteractions.css'
 
 // Layout wrapper to conditionally show Navbar
 function AppLayout({ children }) {
@@ -24,6 +33,9 @@ function AppLayout({ children }) {
 
   return (
     <div className="app-container">
+      <ScrollProgress />
+      <BackToTop />
+      <CustomCursor />
       {!isBlogRoute && !isAdminRoute && <div className="scanlines"></div>}
       <TerminalOverlay />
       {!isBlogRoute && !isAdminRoute && <Navbar />}
@@ -36,7 +48,7 @@ function AppLayout({ children }) {
 const RoleRoute = ({ children, requiredLevel }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div>Auth Check...</div>;
+  if (loading) return <SkeletonLoader className="skeleton-auth-check" count={1} />;
 
   // User must be logged in and have a role level <= requiredLevel (Lower level = higher power)
   if (!user || !user.role || user.role.level > requiredLevel) {
@@ -49,7 +61,7 @@ const RoleRoute = ({ children, requiredLevel }) => {
 const DashboardRouter = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div>Accessing Mainframe...</div>;
+  if (loading) return <SkeletonLoader className="skeleton-auth-check" count={1} />;
   if (!user || !user.role) return <Navigate to="/login" replace />;
 
   switch (user.role.level) {
@@ -68,20 +80,68 @@ function App() {
         <Router>
           <AppLayout>
             <Routes>
-              <Route path="/" element={<MainPage />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/projects" element={<ProjectPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/notes" element={<NotesPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/" element={
+                <PageTransition>
+                  <MainPage />
+                </PageTransition>
+              } />
+              <Route path="/home" element={
+                <PageTransition>
+                  <HomePage />
+                </PageTransition>
+              } />
+              <Route path="/about" element={
+                <PageTransition>
+                  <AboutPage />
+                </PageTransition>
+              } />
+              <Route path="/projects" element={
+                <PageTransition>
+                  <ProjectPage />
+                </PageTransition>
+              } />
+              <Route path="/contact" element={
+                <PageTransition>
+                  <ContactPage />
+                </PageTransition>
+              } />
+              <Route path="/notes" element={
+                <PageTransition>
+                  <NotesPage />
+                </PageTransition>
+              } />
+              <Route path="/login" element={
+                <PageTransition>
+                  <LoginPage />
+                </PageTransition>
+              } />
+              <Route path="/register" element={
+                <PageTransition>
+                  <RegisterPage />
+                </PageTransition>
+              } />
+              <Route path="/forgot-password" element={
+                <PageTransition>
+                  <ForgotPasswordPage />
+                </PageTransition>
+              } />
 
               {/* Blog Routes - Separate Identity */}
-              <Route path="/blog" element={<BlogGateway />} />
-              <Route path="/blog/home" element={<BlogHome />} />
-              <Route path="/blog/post/:slug" element={<BlogPost />} />
+              <Route path="/blog" element={
+                <PageTransition>
+                  <BlogGateway />
+                </PageTransition>
+              } />
+              <Route path="/blog/home" element={
+                <PageTransition>
+                  <BlogHome />
+                </PageTransition>
+              } />
+              <Route path="/blog/post/:slug" element={
+                <PageTransition>
+                  <BlogPost />
+                </PageTransition>
+              } />
 
               {/* Central Dashboard Hub */}
               <Route path="/admin" element={<DashboardRouter />} />
@@ -95,6 +155,13 @@ function App() {
 
               <Route path="/admin/posts/new" element={<RoleRoute requiredLevel={2}><PostEditor /></RoleRoute>} />
               <Route path="/admin/posts/edit/:slug" element={<RoleRoute requiredLevel={2}><PostEditor /></RoleRoute>} />
+
+              {/* 404 Not Found */}
+              <Route path="*" element={
+                <PageTransition>
+                  <NotFound />
+                </PageTransition>
+              } />
             </Routes>
           </AppLayout>
         </Router>
@@ -103,7 +170,15 @@ function App() {
   )
 }
 
-export default App
+function AppWithProviders() {
+  return (
+    <ErrorBoundary>
+      <QueryProvider>
+        <App />
+      </QueryProvider>
+    </ErrorBoundary>
+  );
+}
 
-
+export default AppWithProviders
 

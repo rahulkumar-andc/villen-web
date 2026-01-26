@@ -21,10 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-(suj8#^bgk^0)vzile64i=8cfdr3)c^dg&7kdgvy(3qg*_)6_8')
+if os.getenv('DJANGO_SECRET_KEY'):
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+else:
+    raise ValueError("DJANGO_SECRET_KEY environment variable is required in production")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
@@ -55,12 +58,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Security middleware (custom)
+    'api.security_middleware.SecurityHeadersMiddleware',
+    'api.security_middleware.RateLimitExceededMiddleware',
+    'api.security_middleware.IPWhitelistMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True # For now. In prod set CORS_ALLOWED_ORIGINS via env if needed
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in development
 if not DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'https://villen.me').split(',')
+    CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://.*\.villen\.me$"]
 
 ROOT_URLCONF = 'web.urls'
 
@@ -96,12 +103,24 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
+# Password Hashing - Use Argon2 (more secure than default PBKDF2)
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
+# Enhanced Password Validation - Enforce 12+ character passwords
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 12,  # Enforce 12+ character passwords
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -110,6 +129,29 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# =============================================================================
+# CSRF and Session Security Configuration
+# =============================================================================
+# CSRF Token Settings
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read token from cookie (for AJAX)
+CSRF_USE_SESSIONS = False  # Use cookie-based CSRF tokens
+CSRF_COOKIE_SAMESITE = 'Lax'  # Prevent CSRF from cross-site requests
+
+# Session Configuration  
+SESSION_COOKIE_AGE = 1800  # 30 minutes - Sessions expire after 30 minutes of inactivity
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Clear session when browser closes
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript from accessing session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # Prevent session fixation attacks
+
+# File Upload Configuration
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB - Maximum size for image uploads
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB - Maximum size for form data
+
+# Media files directory (for storing user uploads)
+MEDIA_URL = '/files/'  # URL prefix for media files
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')  # Store uploads in project
 
 
 # Internationalization
@@ -127,7 +169,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+WHITENOISE_AUTOREFRESH = DEBUG
+WHITENOISE_USE_GZIP = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -140,6 +185,17 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',  # Anonymous users: 100 requests/hour
+        'user': '1000/hour'  # Authenticated users: 1000 requests/hour
+    },
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'EXCEPTION_HANDLER': 'api.exceptions.custom_exception_handler',
 }
 
 from datetime import timedelta
@@ -166,3 +222,145 @@ DEFAULT_FROM_EMAIL = 'noreply@shadowlayer.local'
 # EMAIL_HOST_USER = 'your-email@gmail.com'
 # EMAIL_HOST_PASSWORD = 'your-app-password'
 
+
+# =============================================================================
+# Logging Configuration
+# =============================================================================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'django.log',
+            'formatter': 'verbose',
+        },
+        'security_file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'security.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['security_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'api': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# Ensure logs directory exists
+import os
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
+
+
+# =============================================================================
+# Production Security Settings
+# =============================================================================
+if not DEBUG:
+    # ========================================================================
+    # Force HTTPS Redirects
+    # ========================================================================
+    SECURE_SSL_REDIRECT = True
+    
+    # ========================================================================
+    # Secure Cookies
+    # ========================================================================
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+    
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SAMESITE = 'Strict'
+    
+    # ========================================================================
+    # Security Headers (Strict-Transport-Security)
+    # ========================================================================
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # ========================================================================
+    # CSRF Trusted Origins
+    # ========================================================================
+    # Add your Vercel domain and custom domain
+    CSRF_TRUSTED_ORIGINS = [
+        'https://villen.me',
+        'https://www.villen.me',
+        'https://blog.villen.me',
+        'https://*.vercel.app',
+    ]
+    
+    # Allow frontend CORS origins
+    CORS_ALLOWED_ORIGINS = [
+        'https://villen.me',
+        'https://www.villen.me',
+        'https://blog.villen.me',
+    ]
+else:
+    # ========================================================================
+    # Development Settings (Allow HTTP)
+    # ========================================================================
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+    
+    # Allow development frontend origins for CSRF
+    CSRF_TRUSTED_ORIGINS = [
+        'http://localhost:5173',  # Vite frontend dev server
+        'http://localhost:3000',  # Alternative dev port
+        'http://localhost:8000',  # Django dev server
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:8000',
+    ]
+    
+    CORS_ALLOWED_ORIGINS = [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:8000',
+    ]

@@ -1,0 +1,65 @@
+.skeleton-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.skeleton-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.skeleton-header {
+  margin-bottom: 1rem;
+}
+
+.skeleton-line {
+  height: 16px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-line.title {
+  height: 24px;
+  width: 60%;
+}
+
+.skeleton-line.short {
+  width: 80%;
+}
+
+.skeleton-line.button {
+  width: 120px;
+  height: 40px;
+  border-radius: 4px;
+}
+
+.skeleton-footer {
+  margin-top: 1rem;
+}
+
+/* Grid variant */
+.skeleton-loader.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Auth check specific */
+.skeleton-auth-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.skeleton-auth-check .skeleton-line {
+  width: 200px;
+  height: 24px;
+}
+

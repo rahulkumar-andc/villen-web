@@ -1,6 +1,25 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import './AboutPage.css';
 import ScrollReveal from '../components/ScrollReveal';
+import SocialLinks from '../components/SocialLinks';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+// Lazy load heavy components
+const Skills = React.lazy(() => import('../components/Skills'));
+const Timeline = React.lazy(() => import('../components/Timeline'));
+const Guestbook = React.lazy(() => import('../components/Guestbook'));
+
+// Loading component for Suspense fallback
+const ComponentLoading = () => (
+    <div style={{
+        padding: '20px',
+        textAlign: 'center',
+        color: '#00ff00',
+        fontFamily: 'monospace'
+    }}>
+        Loading component...
+    </div>
+);
 
 export const AboutPage = () => {
     return (
@@ -12,6 +31,9 @@ export const AboutPage = () => {
                     <div className="about-header">
                         <h1 className="glitch" data-text="About Villen">About Villen</h1>
                         <h2 className="subtitle">Security Researcher & Developer</h2>
+                        <div className="social-links-container">
+                            <SocialLinks variant="extended" />
+                        </div>
                     </div>
                 </ScrollReveal>
 
@@ -29,7 +51,7 @@ export const AboutPage = () => {
                                     </p>
 
                                     <p>
-                                        I don’t just write code — I question systems, probe assumptions,
+                                        I don't just write code — I question systems, probe assumptions,
                                         and break things ethically to understand how they truly work.
                                     </p>
 
@@ -46,6 +68,13 @@ export const AboutPage = () => {
                                 </div>
                             </div>
                         </ScrollReveal>
+
+                        {/* Skills Section - Lazy Loaded */}
+                        <ErrorBoundary>
+                            <Suspense fallback={<ComponentLoading />}>
+                                <Skills />
+                            </Suspense>
+                        </ErrorBoundary>
                     </div>
 
                     {/* Right Column: What I Do */}
@@ -111,6 +140,20 @@ export const AboutPage = () => {
                     </div>
                 </ScrollReveal>
 
+                {/* Timeline Section - Lazy Loaded */}
+                <ErrorBoundary>
+                    <Suspense fallback={<ComponentLoading />}>
+                        <Timeline />
+                    </Suspense>
+                </ErrorBoundary>
+
+                {/* Guestbook Section - Lazy Loaded */}
+                <ErrorBoundary>
+                    <Suspense fallback={<ComponentLoading />}>
+                        <Guestbook />
+                    </Suspense>
+                </ErrorBoundary>
+
                 {/* Footer */}
                 <ScrollReveal>
                     <div className="about-footer">
@@ -123,3 +166,4 @@ export const AboutPage = () => {
         </div>
     );
 };
+
