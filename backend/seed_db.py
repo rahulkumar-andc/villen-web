@@ -104,24 +104,35 @@ def seed():
 
     # Define Users
     users = [
-        {'user': 'admin', 'email': 'admin@villen.me', 'pass': 'admin123', 'role': 'Super Admin'},
-        {'user': 'manager', 'email': 'manager@villen.me', 'pass': 'manager123', 'role': 'Admin'},
-        {'user': 'mod', 'email': 'mod@villen.me', 'pass': 'mod123', 'role': 'Monitor'},
-        {'user': 'subscriber', 'email': 'sub@villen.me', 'pass': 'sub123', 'role': 'Premium User'},
+        {'user': 'villenadmin', 'email': 'villensec@gmail.com', 'pass': 'Vilen@123Queen@9693', 'role': 'Super Admin'},
+        {'user': 'villenmanager', 'email': 'villensec@gmail.com', 'pass': 'Vilen@123Queen@9693', 'role': 'Admin'},
+        {'user': 'villenmod', 'email': 'villensec@gmail.com', 'pass': 'Vilen@123Queen@9693', 'role': 'Monitor'},
+        {'user': 'villensubscriber', 'email': 'villensec@gmail.com', 'pass': 'Vilen@123Queen@9693', 'role': 'Premium User'},
     ]
 
     for u_data in users:
+        curr_user = None
         if not User.objects.filter(username=u_data['user']).exists():
-            user = User.objects.create_user(u_data['user'], u_data['email'], u_data['pass'])
-            role = Role.objects.get(name=u_data['role'])
-            UserProfile.objects.create(user=user, role=role, is_verified=True)
-            print(f"✅ Created user: {u_data['user']} ({u_data['role']})")
+            if u_data['role'] == 'Super Admin':
+                curr_user = User.objects.create_superuser(u_data['user'], u_data['email'], u_data['pass'])
+                print(f"✅ Created Superuser: {u_data['user']}")
+            else:
+                curr_user = User.objects.create_user(u_data['user'], u_data['email'], u_data['pass'])
+                print(f"✅ Created user: {u_data['user']}")
         else:
-            # Ensure role is correct if user exists
-            user = User.objects.get(username=u_data['user'])
-            if not hasattr(user, 'profile'):
-                 role = Role.objects.get(name=u_data['role'])
-                 UserProfile.objects.create(user=user, role=role, is_verified=True)
+            curr_user = User.objects.get(username=u_data['user'])
+            # Ensure admin is superuser
+            if u_data['role'] == 'Super Admin' and (not curr_user.is_superuser or not curr_user.is_staff):
+                curr_user.is_superuser = True
+                curr_user.is_staff = True
+                curr_user.save()
+                print(f"✅ Promoted {u_data['user']} to Superuser")
+
+        # Assign Role Profile if missing
+        if hasattr(curr_user, 'profile') is False:
+             role = Role.objects.get(name=u_data['role'])
+             UserProfile.objects.create(user=curr_user, role=role, is_verified=True)
+             print(f"✅ Linked profile for {u_data['user']}")
 
 
 if __name__ == '__main__':

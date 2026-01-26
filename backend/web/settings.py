@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-if os.getenv('DJANGO_SECRET_KEY'):
-    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-else:
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+if not DEBUG and not SECRET_KEY:
     raise ValueError("DJANGO_SECRET_KEY environment variable is required in production")
+
+if DEBUG and not SECRET_KEY:
+    SECRET_KEY = "unsafe-dev-secret-key"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
@@ -101,6 +109,7 @@ DATABASES = {
         ssl_require=True
     )
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
