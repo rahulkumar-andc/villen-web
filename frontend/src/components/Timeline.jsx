@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Briefcase, Graduation, Award } from 'lucide-react';
+import { Calendar, Briefcase, GraduationCap, Award } from 'lucide-react';
 import './Timeline.css';
 
 const timelineEvents = [
@@ -53,10 +53,10 @@ const timelineEvents = [
 
 const TimelineItem = ({ event, index }) => {
   const Icon = event.icon;
-  
+
   return (
     <motion.div
-      className={`timeline-item ${event.type}`}
+      className={`timeline - item ${event.type} `}
       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
@@ -71,7 +71,7 @@ const TimelineItem = ({ event, index }) => {
             <Calendar size={14} />
             {event.month} {event.year}
           </span>
-          <span className={`timeline-type ${event.type}`}>{event.type}</span>
+          <span className={`timeline - type ${event.type} `}>{event.type}</span>
         </div>
         <h3 className="timeline-title">{event.title}</h3>
         <p className="timeline-org">{event.organization}</p>
@@ -88,7 +88,7 @@ const Timeline = () => {
       <div className="timeline-container">
         <div className="timeline-line" />
         {timelineEvents.map((event, index) => (
-          <TimelineItem key={`${event.year}-${event.month}-${index}`} event={event} index={index} />
+          <TimelineItem key={`${event.year} -${event.month} -${index} `} event={event} index={index} />
         ))}
       </div>
     </section>
