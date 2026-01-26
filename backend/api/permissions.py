@@ -5,7 +5,12 @@ class IsOwner(permissions.BasePermission):
     Custom permission to only allow owners of an object to access it.
     """
     def has_object_permission(self, request, view, obj):
-        return obj.user == request.user
+        # Check for 'user' or 'author' field
+        if hasattr(obj, 'user'):
+            return obj.user == request.user
+        if hasattr(obj, 'author'):
+            return obj.author == request.user
+        return False
 
 class IsSuperAdmin(permissions.BasePermission):
     """

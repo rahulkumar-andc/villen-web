@@ -13,6 +13,8 @@ from .blog_serializers import (
 )
 
 
+from .permissions import IsAdmin, IsOwner
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def list_categories(request):
@@ -33,20 +35,20 @@ def list_posts(request):
     
     # Allow admins to see everything
     if request.user.is_authenticated:
+        # Check if Admin (Level <= 2) using permissions logic would be cleaner, 
+        # but for list filtering we need to check request.user directly or use a custom queryset method.
+        # We'll keep the manual check here for LIST filtering, but safe.
         try:
-            # Check for profile and role safely
             if hasattr(request.user, 'profile') and request.user.profile.role:
-                if request.user.profile.role.level <= 2: # Admin or Super Admin
+                if request.user.profile.role.level <= 2: # Admin
                     posts = BlogPost.objects.all()
         except Exception:
-            # UserProfile.DoesNotExist or other issues
             pass
-
 
     if category_slug and category_slug != 'all':
         posts = posts.filter(category__slug=category_slug)
     
-    # Filter restricted posts for unauthenticated users (if looking at public list)
+    # Filter restricted posts for unauthenticated users
     if not request.user.is_authenticated:
         posts = posts.filter(is_restricted=False)
     
@@ -57,10 +59,10 @@ def list_posts(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_post(request, slug):
-    """Get single blog post by slug."""
+    """Get single blog post."""
     post = get_object_or_404(BlogPost, slug=slug)
     
-    # Check access
+    # Check access logic model method
     if not post.can_access(request.user):
         return Response({
             'error': 'Access denied. Login required.',
@@ -72,16 +74,10 @@ def get_post(request, slug):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdmin])
 def create_post(request):
     """Create a new blog post (admin only)."""
-    # Check if user is admin
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.role or profile.role.level > 2:
-        return Response({
-            'error': 'Admin access required.'
-        }, status=status.HTTP_403_FORBIDDEN)
-    
+    # Permission class handles the check now
     serializer = BlogPostCreateSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         post = serializer.save()
@@ -95,21 +91,22 @@ def update_delete_post(request, slug):
     """Update or delete a blog post."""
     post = get_object_or_404(BlogPost, slug=slug)
     
-    # Check if user is admin or author
-    profile = getattr(request.user, 'profile', None)
-    is_admin = profile and profile.role and profile.role.level <= 2
-    is_author = post.author == request.user
+    # Manual check for OR condition (Admin OR Owner)
+    # DRF function-based views with OR permissions are tricky with decorators.
+    # So we used IsAuthenticated above, and check object permission here.
     
-    if not (is_admin or is_author):
-        return Response({
-            'error': 'Permission denied.'
-        }, status=status.HTTP_403_FORBIDDEN)
+    # We can use our Permission classes manually
+    is_admin = IsAdmin().has_permission(request, None)
+    is_owner = IsOwner().has_object_permission(request, None, post)
+    
+    if not (is_admin or is_owner):
+        return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
     if request.method == 'DELETE':
         post.delete()
         return Response({'message': 'Post deleted.'}, status=status.HTTP_200_OK)
     
-    # PUT - update
+    # PUT
     serializer = BlogPostCreateSerializer(post, data=request.data, partial=True, context={'request': request})
     if serializer.is_valid():
         post = serializer.save()
